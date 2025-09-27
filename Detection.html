@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DumpGuard AI - Live Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-lg">DG</span>
+        </div>
+        <span class="text-xl font-bold text-gray-800">DumpGuard AI</span>
+      </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="HOME.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Home</a>
+        <a href="dashboard.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Dashboard</a>
+        <a href="detection.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Live Detection</a>
+        <a href="analytics.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Analytics</a>
+        <a href="alert.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Alerts</a>
+      </div>
+      <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Login</a>
+    </div>
+  </div>
+</nav>
+
+<section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Live AI Detection</h2>
+
+  <div class="grid lg:grid-cols-2 gap-8">
+    <!-- Camera Feed -->
+    <div class="bg-gray-900 rounded-xl p-6 relative">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-white text-lg font-semibold">Camera Feed - Zone A</h3>
+        <div class="bg-green-500 px-3 py-1 rounded-full text-white text-sm font-medium">🔴 LIVE</div>
+      </div>
+      <div class="bg-gray-800 rounded-lg h-64 flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900"></div>
+        <div class="relative z-10 text-center">
+          <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span class="text-white text-2xl">📹</span>
+          </div>
+          <p class="text-gray-300">Live AI Detection Active</p>
+          <p class="text-green-400 text-sm mt-2">✓ Monitoring in progress</p>
+        </div>
+        <div class="absolute top-4 left-4 bg-green-500 text-white px-2 py-1 rounded text-xs">AI: MONITORING</div>
+      </div>
+    </div>
+
+    <!-- Detection Feed -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Detections</h3>
+      <div id="detectionFeed" class="space-y-4">
+        <p class="text-gray-500 text-center py-8" id="loadingMessage">Loading real-time data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detection Toggles -->
+  <div class="bg-gray-50 rounded-xl p-8 mt-12">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800">Detection Controls</h3>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="flex items-center justify-between">
+        <label class="text-gray-700">Stray Dog Detection</label>
+        <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500 transition-colors" onclick="toggleDetection(this, 'dog')">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+        </button>
+      </div>
+      <div class="flex items-center justify-between">
+        <label class="text-gray-700">Waste Dump Detection</label>
+        <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500 transition-colors" onclick="toggleDetection(this, 'waste')">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+        </button>
+      </div>
+      <div class="flex items-center justify-between">
+        <label class="text-gray-700">Real-time Alerts</label>
+        <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500 transition-colors" onclick="toggleDetection(this, 'alerts')">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_KEY';
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const dogCountEl = document.getElementById('dogCount');
+const wasteCountEl = document.getElementById('wasteCount');
+const alertCountEl = document.getElementById('alertCount');
+const detectionFeedEl = document.getElementById('detectionFeed');
+const loadingMessageEl = document.getElementById('loadingMessage');
+
+async function fetchCounts() {
+  const { count: dogCount } = await supabase.from('detections').select('*', { count:'exact', head:true }).eq('type','stray_dog');
+  const { count: wasteCount } = await supabase.from('detections').select('*', { count:'exact', head:true }).eq('type','waste_dump');
+  dogCountEl && (dogCountEl.textContent = dogCount || 0);
+  wasteCountEl && (wasteCountEl.textContent = wasteCount || 0);
+  alertCountEl && (alertCountEl.textContent = (dogCount || 0) + (wasteCount || 0));
+}
+
+async function fetchDetectionFeed() {
+  const { data: detections } = await supabase.from('detections').select('type,camera_zone,created_at').order('created_at',{ascending:false}).limit(5);
+  if (loadingMessageEl) loadingMessageEl.remove();
+  detectionFeedEl.innerHTML = '';
+  detections.forEach(d => {
+    const emoji = d.type==='stray_dog'?'🐕':'🗑';
+    const title = d.type==='stray_dog'?'Stray Dog Detected':'Illegal Waste Dump';
+    const color = d.type==='stray_dog'?'orange':'red';
+    detectionFeedEl.insertAdjacentHTML('beforeend',`
+      <div class="flex items-center space-x-4 p-3 bg-${color}-50 rounded-lg border-l-4 border-${color}-400">
+        <span class="text-2xl">${emoji}</span>
+        <div class="flex-1">
+          <p class="font-medium text-gray-800">${title}</p>
+          <p class="text-sm text-gray-600">${d.camera_zone} • ${new Date(d.created_at).toLocaleTimeString()}</p>
+        </div>
+        <button class="bg-${color}-500 text-white px-3 py-1 rounded text-sm">${d.type==='stray_dog'?'View':'Alert'}</button>
+      </div>
+    `);
+  });
+}
+
+supabase.channel('schema-db-changes').on('postgres_changes',{event:'INSERT', schema:'public', table:'detections'}, payload => {
+  fetchCounts(); fetchDetectionFeed(); showNotification(⚡ ${payload.new.type.replace('_',' ')} detected in ${payload.new.camera_zone});
+}).subscribe();
+
+document.addEventListener('DOMContentLoaded',()=>{
+  fetchCounts();
+  fetchDetectionFeed();
+});
+
+function toggleDetection(button, type) {
+  const active = button.classList.contains('bg-green-500');
+  const span = button.querySelector('span');
+  if(active){ button.classList.replace('bg-green-500','bg-gray-300'); span.classList.replace('translate-x-6','translate-x-1'); }
+  else { button.classList.replace('bg-gray-300','bg-green-500'); span.classList.replace('translate-x-1','translate-x-6'); }
+  showNotification(${type.charAt(0).toUpperCase()+type.slice(1)} detection ${active?'disabled':'enabled'});
+}
+
+function showNotification(message) {
+  const notification=document.createElement('div');
+  notification.className='fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform';
+  notification.textContent=message;
+  document.body.appendChild(notification);
+  setTimeout(()=>notification.classList.remove('translate-x-full'),100);
+  setTimeout(()=>{ notification.classList.add('translate-x-full'); setTimeout(()=>document.body.removeChild(notification),300); },3000);
+}
+</script>
+</body>
+</html>
