@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DumpGuard AI - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-lg">DG</span>
+        </div>
+        <span class="text-xl font-bold text-gray-800">DumpGuard AI</span>
+      </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="HOME.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Home</a>
+        <a href="dashboard.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Dashboard</a>
+        <a href="detection.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Live Detection</a>
+        <a href="analytics.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Analytics</a>
+        <a href="alert.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Alerts</a>
+      </div>
+      <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Login</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Summary Cards -->
+<section class="py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Dashboard</h2>
+    <div class="grid md:grid-cols-4 gap-6 mb-12">
+      <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-600 text-sm font-medium">Active Cameras</p>
+            <p class="text-2xl font-bold text-green-800" id="activeCameras">24</p>
+          </div>
+          <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+            <span class="text-white text-xl">📹</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-orange-50 p-6 rounded-xl border border-orange-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-orange-600 text-sm font-medium">Stray Dogs Detected</p>
+            <p class="text-2xl font-bold text-orange-800" id="dogCount">0</p>
+          </div>
+          <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+            <span class="text-white text-xl">🐕</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-red-50 p-6 rounded-xl border border-red-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-red-600 text-sm font-medium">Waste Dumps Found</p>
+            <p class="text-2xl font-bold text-red-800" id="wasteCount">0</p>
+          </div>
+          <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
+            <span class="text-white text-xl">🗑</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-blue-600 text-sm font-medium">Alerts Today</p>
+            <p class="text-2xl font-bold text-blue-800" id="alertCount">0</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+            <span class="text-white text-xl">🚨</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-gray-50 rounded-xl p-8">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Quick Actions</h3>
+      <div class="space-y-3 md:grid md:grid-cols-3 md:gap-4">
+        <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors" onclick="generateReport()">
+          📊 Generate Daily Report
+        </button>
+        <button class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors" onclick="dispatchTeam()">
+          🚐 Dispatch Response Team
+        </button>
+        <button class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors" onclick="exportData()">
+          💾 Export Detection Data
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+  setTimeout(() => {
+    notification.classList.add('translate-x-full');
+    setTimeout(() => document.body.removeChild(notification), 300);
+  }, 3000);
+}
+
+function generateReport() { showNotification('📊 Daily report generated successfully!'); }
+function dispatchTeam() { showNotification('🚐 Response team dispatched!'); }
+function exportData() { showNotification('💾 Detection data exported!'); }
+</script>
+</body>
+</html>
